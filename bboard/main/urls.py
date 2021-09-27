@@ -12,4 +12,5 @@ urlpatterns = [
     path('accounts/password/change/', views.BBPasswordChangeView.as_view(), name='password_change'),
     path('accounts/register/', views.RegisterUserView.as_view(), name='register'),
     path('accounts/register/done/', views.RegisterDoneView.as_view(), name='register_done'),
+    path('accounts/register/activate/<str:sign>/', views.user_activate, name='register_activate'),
 ]
