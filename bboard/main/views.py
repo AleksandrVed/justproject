@@ -15,7 +15,8 @@ from .utilites import signer
 from django.core.signing import BadSignature
 from django.contrib.auth import logout
 from django.contrib import messages
-
+from django.core.paginator import Paginator
+from django.db.models import Q
 
 def index(request):
     return render(request, 'main/index.html')
@@ -95,3 +96,22 @@ class DeleteUserView(DeleteView):
         if not queryset:
             queryset = self.get_queryset()
         return get_object_or_404(queryset, pk=self.user_id)
+
+def by_rubric(request, pk):
+    rubric = get_object_or_404(models.SubRubric, pk = pk)
+    bbs = models.Bb.objects.filter(is_active = True, rubric =pk)
+    if 'keyword' in request.GET:
+        keyword = request.GET['keyword']
+        q = Q(title__icontains=keyword) | Q(title__icontains=keyword)
+        bbs = bbs.filter(q)
+    else:
+        keyword = ''
+    form = forms.SearchForm(initial={'keyword': keyword})
+    paginator = Paginator(bbs, 2)
+    if 'page' in request.GET:
+        page_num = request.GET['page']
+    else:
+        page_num = 1
+    page = paginator.get_page(page_num)
+    context = {'rubric': rubric, 'page': page, 'bbs': page.object_list, 'form': form}
+    return render(request, 'main/by_rubric.html', context)

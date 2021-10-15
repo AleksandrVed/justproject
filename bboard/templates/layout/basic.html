@@ -16,7 +16,9 @@
     </header>
     <div class="row">
         <ul class="col nav justify-content-end border">
+            {% if not user.is_authenticated%}
             <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">Регистрация</a> </li>
+            {% endif %}
             {% if user.is_authenticated%}
             <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" data-toggle = "dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Профиль</a>
                 <div class="dropdown-menu dropdown-menu-right">
@@ -37,13 +39,15 @@
     <div class="row">
         <nav class="col-md-auto nav flex-column border">
             <a class="nav-link root" href="{% url 'index' %}">Главная</a>
-            <span class="nav-link root font-weight-bold">Недвижимость</span>
-            <a class="nav-link" href="#">Жилье</a>
-            <a class="nav-link" href="#">Склады</a>
-            <a class="nav-link" href="#">Гаражи</a>
-            <span class="nav-link root font-weight-bold" href="#">Транспорт</span>
-            <a class="nav-link" href="#">Легковой</a>
-            <a class="nav-link" href="#">Грузовой</a>
+
+            {% for rubric in rubrics %}
+            {% ifchanged rubric.super_rubric.pk %}
+            <span class="nav-link root font_weight-bold">
+                {{rubric.super_rubric.name }}
+            </span>
+            {% endifchanged %}
+            <a class="nav-lonk" href="{%url 'by_rubric' pk=rubric.pk %}">{{rubric.name}}</a>
+            {%endfor%}
             <a class="nav-link root" href="{% url 'other' page='about' %}">О сайте</a>
         </nav>
         <section class="col border py-2">
