@@ -4,6 +4,7 @@ from .views import other_page
 
 urlpatterns = [
     path('', views.index, name='index'),
+    path('<int:rubric_pk>/<int:pk>/', views.detail, name='detail'),
     path('<int:pk>', views.by_rubric, name='by_rubric'),
     path('<str:page>/', other_page, name='other'),
     path('accounts/login/', views.BBLoginView.as_view(), name='login'),

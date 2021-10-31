@@ -18,7 +18,6 @@ class BbAdmin(admin.ModelAdmin):
     list_display = ('rubric', 'title', 'content', 'author', 'created_at')
     fields = (('rubric', 'author'), 'title', 'content', 'price', 'contacts', 'image', 'is_active')
     inlines = (AdditionalImageInline,)
-admin.site.register(Bb, BbAdmin)
 
 class NonactivatedFilter(admin.SimpleListFilter):
     title = 'Прошли активацию?'
@@ -55,7 +54,6 @@ class AdvUserAdmin(admin.ModelAdmin):
               ('last_login', 'date_joined'))
     readonly_fields = ('last_login', 'date_joined')
     actions = (send_activation_notifications,)
-admin.site.register(AdvUser, AdvUserAdmin)
 
 class SubRubricInline(admin.TabularInline):
     model = SubRubric
@@ -64,4 +62,6 @@ class SubRubricAdmin(admin.ModelAdmin):
     form = SubRubricForm
 
 admin.site.register(SuperRubric, SubRubricAdmin)
+admin.site.register(Bb, BbAdmin)
+admin.site.register(AdvUser, AdvUserAdmin)
 
