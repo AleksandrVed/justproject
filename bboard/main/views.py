@@ -57,7 +57,9 @@ class BBPasswordChangeView(SuccessMessageMixin, LoginRequiredMixin, PasswordChan
 
 @login_required
 def profile(request):
-    return render(request, 'main/profile.html')
+    bbs = models.Bb.objects.filter(author=request.user.pk)
+    context = {'bbs':bbs}
+    return render(request, 'main/profile.html', context)
 
 class RegisterUserView(CreateView):
     model = models.AdvUser
@@ -123,3 +125,8 @@ def detail(request, rubric_pk, pk):
     ais = bb.additionalimage_set.all()
     context = {'bb': bb, 'ais': ais}
     return render(request, 'main/detail.html', context)
+
+def profile_bb_detail(request, pk):
+    bb = get_object_or_404(models.Bb, pk = pk)
+    ais = bb.additionalimage_set.all()
+    return render(request, 'main/profile_bb_detail.html', context={'bb': bb, 'ais': ais})

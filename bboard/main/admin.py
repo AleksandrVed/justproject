@@ -1,23 +1,16 @@
 from django.contrib import admin
-from .models import AdvUser, SuperRubric, SubRubric, AdditionalImage, Bb
 import datetime
-from .utilites import send_activation_notification
+from .models import AdvUser, Bb, AdditionalImage
 from .forms import SubRubricForm
+from .utilites import send_activation_notification
 
 def send_activation_notifications(modeladmin, request, queryset):
     for rec in queryset:
         if not rec.is_activated:
             send_activation_notification(rec)
     modeladmin.message_user(request, 'Письма с требованиями отправлены')
-send_activation_notifications.short_description = 'Отправка писем с требованиями активации'
-
-class AdditionalImageInline(admin.TabularInline):
-    model = AdditionalImage
-
-class BbAdmin(admin.ModelAdmin):
-    list_display = ('rubric', 'title', 'content', 'author', 'created_at')
-    fields = (('rubric', 'author'), 'title', 'content', 'price', 'contacts', 'image', 'is_active')
-    inlines = (AdditionalImageInline,)
+send_activation_notifications.short_description = \
+'Отправка писем с требованиями активации'
 
 class NonactivatedFilter(admin.SimpleListFilter):
     title = 'Прошли активацию?'
@@ -44,7 +37,7 @@ class NonactivatedFilter(admin.SimpleListFilter):
                                    date_joined__date__lt=d)
 
 class AdvUserAdmin(admin.ModelAdmin):
-    list_display = ('__str__', 'is_active', 'date_joined')
+    list_display = ('__str__', 'is_activated', 'date_joined')
     search_fields = ('username', 'email', 'first_name', 'last_name')
     list_filter = (NonactivatedFilter,)
     fields = (('username', 'email'), ('first_name', 'last_name'),
@@ -55,13 +48,30 @@ class AdvUserAdmin(admin.ModelAdmin):
     readonly_fields = ('last_login', 'date_joined')
     actions = (send_activation_notifications,)
 
+admin.site.register(AdvUser, AdvUserAdmin)
+
+from .models import SuperRubric, SubRubric
+
 class SubRubricInline(admin.TabularInline):
     model = SubRubric
+class SuperRubricAdmin(admin.ModelAdmin):
+    exclude = ('super_rubric',)
+    inlines = (SubRubricInline,)
+
+admin.site.register(SuperRubric, SuperRubricAdmin)
 
 class SubRubricAdmin(admin.ModelAdmin):
     form = SubRubricForm
 
-admin.site.register(SuperRubric, SubRubricAdmin)
-admin.site.register(Bb, BbAdmin)
-admin.site.register(AdvUser, AdvUserAdmin)
+admin.site.register(SubRubric, SubRubricAdmin)
 
+class AdditionalImageInline(admin.TabularInline):
+    model = AdditionalImage
+
+class BbAdmin(admin.ModelAdmin):
+    list_display = ('rubric', 'title', 'content', 'author', 'created_at')
+    fields = (('rubric', 'author'), 'title', 'content', 'price',
+              'contacts', 'image', 'is_active')
+    inlines = (AdditionalImageInline,)
+
+admin.site.register(Bb, BbAdmin)

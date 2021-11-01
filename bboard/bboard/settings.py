@@ -44,7 +44,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-#EMAIL_PORT = 1025
+EMAIL_PORT = 1025
 
 AUTH_USER_MODEL = 'main.AdvUser'
 # Application definition
