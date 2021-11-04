@@ -4,6 +4,7 @@ from django.contrib.auth import password_validation
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from .apps import user_registered
+from django.forms import inlineformset_factory
 
 class ChangeUserInfoForm(forms.ModelForm):
     email = forms.EmailField(required=True, label='Адрес электронной почты')
@@ -57,3 +58,10 @@ class SubRubricForm(forms.ModelForm):
 
 class SearchForm(forms.Form):
     keyword = forms.CharField(required=False, max_length=20, label='')
+
+class BbForm(forms.ModelForm):
+    class Meta:
+        model = models.Bb
+        fields = '__all__'
+        widgets = {'author': forms.HiddenInput}
+AIFormSet = inlineformset_factory(models.Bb, models.AdditionalImage, fields='__all__')

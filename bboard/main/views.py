@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse, Http404
 from django.template.loader import get_template
 from django.template import TemplateDoesNotExist
@@ -130,3 +130,49 @@ def profile_bb_detail(request, pk):
     bb = get_object_or_404(models.Bb, pk = pk)
     ais = bb.additionalimage_set.all()
     return render(request, 'main/profile_bb_detail.html', context={'bb': bb, 'ais': ais})
+
+@login_required
+def profile_bb_add(request):
+    if request.method == 'POST':
+        form = forms.BbForm(request.POST, request.FILES)
+        if form.is_valid():
+            bb = form.save()
+            formset = forms.AIFormSet(request.POST, request.FILES, instance=bb)
+        if formset.is_valid():
+            formset.save()
+            messages.add_message(request, messages.SUCCESS, 'Объявление доюавлено')
+            return redirect('profile')
+    else:
+        form = forms.BbForm(initial={'author': request.user.pk})
+        formset = forms.AIFormSet()
+    context = {'form': form, 'formset': formset}
+    return render(request, 'main/profile_bb_add.html', context)
+
+@login_required
+def profile_bb_change(request, pk):
+    bb = get_object_or_404(models.Bb, pk=pk)
+    if request.method == 'POST':
+        form = forms.BbForm(request.POST, request.FILES, instance=bb)
+        if form.is_valid():
+            bb = form.save()
+            formset = forms.AIFormSet(request.POST, request.FILES, instance=bb)
+            if formset.is_valid():
+                formset.save()
+                messages.add_message(request, messages.SUCCESS, 'Объявление изменено')
+                return redirect('profile')
+    else:
+        form = forms.BbForm(instance=bb)
+        formset = forms.AIFormSet(instance=bb)
+    context = {'form': form, 'formset': formset}
+    return render(request, 'main/profile_bb_change.html', context)
+
+@login_required
+def profile_bb_delete(request, pk):
+    bb = get_object_or_404(models.Bb, pk=pk)
+    if request.method == 'POST':
+        bb.delete()
+        messages.add_message(request, messages.SUCCESS, 'Объявление удалено')
+        return redirect('profile')
+    else:
+        context = {'bb': bb}
+        return render(request, 'main/profile_bb_delete.html', context)
